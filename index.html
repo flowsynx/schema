@@ -94,14 +94,23 @@
         <thead>
           <tr>
             <th scope="col" style="width: 20%">Version</th>
-            <th scope="col">Description</th>
-            <th scope="col" style="width: 15%">Actions</th>
+            <th scope="col">Generated Date</th>
+            <th scope="col" style="width: 15%;">Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr>
+            <td><strong>v1.1.0</strong></td>
+            <td data-date="2025-10-30"></td>
+            <td>
+              <a href="workflows/v1.1.0/schema.json" class="btn btn-outline-primary btn-sm">
+                View JSON
+              </a>
+            </td>
+          </tr>
+          <tr>
             <td><strong>v1.0.0</strong></td>
-            <td>Defines the structure of a FlowSynx workflow definition JSON.</td>
+            <td data-date="2025-09-27"></td>
             <td>
               <a href="workflows/v1.0.0/schema.json" class="btn btn-outline-primary btn-sm">
                 View JSON
@@ -119,4 +128,21 @@
     </div>
   </footer>
 </body>
+
+<script>
+  // Function to format ISO date
+  function formatDate(isoDate) {
+    const dateObj = new Date(isoDate);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const readableDate = dateObj.toLocaleDateString('en-US', options);
+    return `${isoDate} | ${readableDate}`;
+  }
+
+  // Apply function to all table cells with data-date
+  const dateCells = document.querySelectorAll('td[data-date]');
+  dateCells.forEach(td => {
+    const isoDate = td.getAttribute('data-date');
+    td.textContent = formatDate(isoDate);
+  });
+</script>
 </html>
