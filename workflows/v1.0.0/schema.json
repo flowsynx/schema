@@ -3,67 +3,66 @@
   "version": "1.0.0",
   "title": "FlowSynx Workflow Definition",
   "type": "object",
-  "required": [ "Name", "Description", "Configuration", "Tasks" ],
-  "properties": {
-    "Name": {
+  "required": [ "Name", "Tasks" ],
+  "patternProperties": {
+    "(?i)^Name$": {
       "type": "string",
       "description": "Unique name identifying the workflow."
     },
-    "Description": {
+    "(?i)^Description$": {
       "type": "string",
       "description": "Detailed description of the workflow."
     },
-    "Configuration": {
+    "(?i)^Configuration$": {
       "type": "object",
       "required": [ "DegreeOfParallelism", "Timeout", "ErrorHandling" ],
-      "properties": {
-        "DegreeOfParallelism": {
+      "patternProperties": {
+        "(?i)^DegreeOfParallelism$": {
           "type": "integer",
           "minimum": 1,
           "description": "Maximum number of tasks to execute concurrently."
         },
-        "Timeout": {
+        "(?i)^Timeout$": {
           "type": "integer",
           "minimum": 0,
           "description": "Workflow-level timeout in milliseconds."
         },
-        "ErrorHandling": {
+        "(?i)^ErrorHandling$": {
           "type": "object",
-          "required": [ "Strategy" ],
-          "properties": {
-            "Strategy": {
+          "patternProperties": {
+            "(?i)^Strategy$": {
               "type": "string",
-              "enum": [ "Abort", "Skip", "Retry" ],
+              "pattern": "(?i)^(Abort|Skip|Retry)$",
               "description": "Defines how the workflow reacts when a task fails."
             },
-            "RetryPolicy": {
+            "(?i)^RetryPolicy$": {
               "type": "object",
-              "properties": {
-                "MaxRetries": {
+              "patternProperties": {
+                "(?i)^MaxRetries$": {
                   "type": "integer",
                   "minimum": 0,
                   "default": 3,
                   "description": "Maximum number of retry attempts for failed tasks."
                 },
-                "BackoffStrategy": {
+                "(?i)^BackoffStrategy$": {
                   "type": "string",
-                  "enum": [ "Fixed", "Linear", "Exponential", "Jitter" ],
+                  "pattern": "(?i)^(Fixed|Linear|Exponential|Jitter)$",
                   "default": "Fixed",
                   "description": "Strategy used to determine the delay between retries."
                 },
-                "InitialDelay": {
+                "(?i)^InitialDelay$": {
                   "type": "integer",
                   "minimum": 0,
                   "default": 1000,
                   "description": "Initial delay (in milliseconds) before the first retry."
                 },
-                "MaxDelay": {
+                "(?i)^MaxDelay$": {
                   "type": "integer",
                   "minimum": 0,
                   "default": 10000,
                   "description": "Maximum delay (in milliseconds) between retries."
                 },
-                "BackoffCoefficient": {
+                "(?i)^BackoffCoefficient$": {
                   "type": "number",
                   "minimum": 0,
                   "default": 2.0,
@@ -78,19 +77,23 @@
       },
       "additionalProperties": false
     },
-    "Tasks": {
+    "(?i)^Tasks$": {
       "type": "array",
       "minItems": 1,
       "description": "List of tasks that make up the workflow.",
       "items": {
         "type": "object",
-        "required": [ "Name", "Type", "Parameters", "Position" ],
-        "properties": {
-          "Name": {
+        "required": [ "Name", "Type" ],
+        "patternProperties": {
+          "(?i)^Name$": {
             "type": "string",
             "description": "Unique name identifying the task."
           },
-          "Type": {
+          "(?i)^Description$": {
+            "type": "string",
+            "description": "Optional description of the task."
+          },
+          "(?i)^Type$": {
             "oneOf": [
               {
                 "type": "string",
@@ -98,17 +101,17 @@
               },
               {
                 "type": "object",
-                "required": [ "Plugin", "Version" ],
-                "properties": {
-                  "Plugin": {
+                "required": [ "Plugin", "Version", "Description", "Timeout", "Output", "ErrorHandling" ],
+                "patternProperties": {
+                  "(?i)^Plugin$": {
                     "type": "string",
                     "description": "Name of the plugin providing this task."
                   },
-                  "Version": {
+                  "(?i)^Version$": {
                     "type": "string",
                     "description": "Version of the plugin used."
                   },
-                  "Specifications": {
+                  "(?i)^Specifications$": {
                     "type": "object",
                     "description": "Plugin-specific configuration options.",
                     "additionalProperties": true
@@ -118,25 +121,85 @@
               }
             ]
           },
-          "Dependencies": {
+          "(?i)^Timeout$": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Optional timeout for the task in milliseconds."
+          },
+          "(?i)^Dependencies$": {
             "type": "array",
             "items": { "type": "string" },
             "description": "Names of tasks that must complete before this task starts."
           },
-          "Parameters": {
+          "(?i)^Parameters$": { 
             "type": "object",
             "description": "Task-specific input parameters.",
             "additionalProperties": true
           },
-          "Position": {
+          "(?i)^ErrorHandling$": {
+            "type": "object",
+            "description": "Optional error handling configuration for the task.",
+            "patternProperties": {
+              "(?i)^Strategy$": {
+                "type": "string",
+                "pattern": "(?i)^(Abort|Skip|Retry)$",
+                "default": "Abort",
+                "description": "Defines how the task reacts when an error occurs."
+              },
+              "(?i)^RetryPolicy$": {
+                "type": "object",
+                "description": "Retry policy configuration for the task.",
+                "patternProperties": {
+                  "(?i)^MaxRetries$": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 3,
+                    "description": "Maximum number of retry attempts for failed tasks."
+                  },
+                  "(?i)^BackoffStrategy$": {
+                    "type": "string",
+                    "pattern": "(?i)^(Fixed|Linear|Exponential|Jitter)$",
+                    "default": "Fixed",
+                    "description": "Strategy used to determine the delay between retries."
+                  },
+                  "(?i)^InitialDelay$": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 1000,
+                    "description": "Initial delay (in milliseconds) before the first retry."
+                  },
+                  "(?i)^MaxDelay$": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 10000,
+                    "description": "Maximum delay (in milliseconds) between retries."
+                  },
+                  "(?i)^BackoffCoefficient$": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 2.0,
+                    "description": "Multiplier applied to the delay for exponential backoff."
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "(?i)^Output$": {
+            "type": "string",
+            "default": "",
+            "description": "Optional output of the task."
+          },
+          "(?i)^Position$": {
             "type": "object",
             "required": [ "X", "Y" ],
-            "properties": {
-              "X": {
+            "patternProperties": {
+              "(?i)^X$": {
                 "type": "number",
                 "description": "Horizontal coordinate for visual placement."
               },
-              "Y": {
+              "(?i)^Y$": {
                 "type": "number",
                 "description": "Vertical coordinate for visual placement."
               }
@@ -149,4 +212,4 @@
     }
   },
   "additionalProperties": false
-}
+} 
