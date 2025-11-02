@@ -15,7 +15,6 @@
     },
     "(?i)^Configuration$": {
       "type": "object",
-      "required": [ "DegreeOfParallelism", "Timeout", "ErrorHandling" ],
       "patternProperties": {
         "(?i)^DegreeOfParallelism$": {
           "type": "integer",
@@ -90,7 +89,7 @@
             "description": "Unique name identifying the task."
           },
           "(?i)^Description$": {
-            "type": "string",
+            "type": ["string", "null"],
             "description": "Optional description of the task."
           },
           "(?i)^Type$": {
@@ -101,7 +100,7 @@
               },
               {
                 "type": "object",
-                "required": [ "Plugin", "Version", "Description", "Timeout", "Output", "ErrorHandling" ],
+                "required": [ "Plugin", "Version"],
                 "patternProperties": {
                   "(?i)^Plugin$": {
                     "type": "string",
