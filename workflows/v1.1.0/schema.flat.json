@@ -1,67 +1,75 @@
 {
-  "$schema": "https://schema.flowsynx.io/workflows/v1.0.0/schema.json",
-  "version": "1.0.0",
+  "$schema": "https://schema.flowsynx.io/workflows/v1.1.0/schema.lower.json",
+  "version": "1.1.0",
   "title": "FlowSynx Workflow Definition",
   "type": "object",
-  "required": [ "Name", "Tasks" ],
-  "patternProperties": {
-    "(?i)^Name$": {
+  "required": [ "name", "tasks" ],
+  "properties": {
+    "name": {
       "type": "string",
       "description": "Unique name identifying the workflow."
     },
-    "(?i)^Description$": {
+    "description": {
       "type": "string",
       "description": "Detailed description of the workflow."
     },
-    "(?i)^Configuration$": {
+    "variables": {
+      "type": ["object", "null"],
+      "description": "A dictionary of variables used in the workflow, accessible in tasks.",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "object", "array", "null"],
+        "description": "Variable value, can be any JSON type."
+      }
+    },
+    "configuration": {
       "type": "object",
-      "patternProperties": {
-        "(?i)^DegreeOfParallelism$": {
+      "properties": {
+        "degreeofparallelism": {
           "type": "integer",
           "minimum": 1,
           "description": "Maximum number of tasks to execute concurrently."
         },
-        "(?i)^Timeout$": {
+        "timeout": {
           "type": "integer",
           "minimum": 0,
           "description": "Workflow-level timeout in milliseconds."
         },
-        "(?i)^ErrorHandling$": {
+        "errorhandling": {
           "type": "object",
-          "patternProperties": {
-            "(?i)^Strategy$": {
+          "properties": {
+            "strategy": {
               "type": "string",
-              "pattern": "(?i)^(Abort|Skip|Retry)$",
+              "enum": [ "abort", "skip", "retry" ],
               "description": "Defines how the workflow reacts when a task fails."
             },
-            "(?i)^RetryPolicy$": {
+            "retrypolicy": {
               "type": "object",
-              "patternProperties": {
-                "(?i)^MaxRetries$": {
+              "properties": {
+                "maxretries": {
                   "type": "integer",
                   "minimum": 0,
                   "default": 3,
                   "description": "Maximum number of retry attempts for failed tasks."
                 },
-                "(?i)^BackoffStrategy$": {
+                "backoffstrategy": {
                   "type": "string",
-                  "pattern": "(?i)^(Fixed|Linear|Exponential|Jitter)$",
+                  "enum": [ "fixed", "linear", "exponential", "jitter" ],
                   "default": "Fixed",
                   "description": "Strategy used to determine the delay between retries."
                 },
-                "(?i)^InitialDelay$": {
+                "initialdelay": {
                   "type": "integer",
                   "minimum": 0,
                   "default": 1000,
                   "description": "Initial delay (in milliseconds) before the first retry."
                 },
-                "(?i)^MaxDelay$": {
+                "maxdelay": {
                   "type": "integer",
                   "minimum": 0,
                   "default": 10000,
                   "description": "Maximum delay (in milliseconds) between retries."
                 },
-                "(?i)^BackoffCoefficient$": {
+                "backoffcoefficient": {
                   "type": "number",
                   "minimum": 0,
                   "default": 2.0,
@@ -76,23 +84,23 @@
       },
       "additionalProperties": false
     },
-    "(?i)^Tasks$": {
+    "tasks": {
       "type": "array",
       "minItems": 1,
       "description": "List of tasks that make up the workflow.",
       "items": {
         "type": "object",
-        "required": [ "Name", "Type" ],
-        "patternProperties": {
-          "(?i)^Name$": {
+        "required": [ "name", "type" ],
+        "properties": {
+          "name": {
             "type": "string",
             "description": "Unique name identifying the task."
           },
-          "(?i)^Description$": {
+          "description": {
             "type": ["string", "null"],
             "description": "Optional description of the task."
           },
-          "(?i)^Type$": {
+          "type": {
             "oneOf": [
               {
                 "type": "string",
@@ -100,17 +108,17 @@
               },
               {
                 "type": "object",
-                "required": [ "Plugin", "Version"],
-                "patternProperties": {
-                  "(?i)^Plugin$": {
+                "required": [ "plugin", "version"],
+                "properties": {
+                  "plugin": {
                     "type": "string",
                     "description": "Name of the plugin providing this task."
                   },
-                  "(?i)^Version$": {
+                  "version": {
                     "type": "string",
                     "description": "Version of the plugin used."
                   },
-                  "(?i)^Specifications$": {
+                  "specifications": {
                     "type": "object",
                     "description": "Plugin-specific configuration options.",
                     "additionalProperties": true
@@ -120,60 +128,60 @@
               }
             ]
           },
-          "(?i)^Timeout$": {
+          "timeout": {
             "type": "integer",
             "minimum": 0,
             "description": "Optional timeout for the task in milliseconds."
           },
-          "(?i)^Dependencies$": {
+          "dependencies": {
             "type": "array",
             "items": { "type": "string" },
             "description": "Names of tasks that must complete before this task starts."
           },
-          "(?i)^Parameters$": { 
+          "parameters": { 
             "type": "object",
             "description": "Task-specific input parameters.",
             "additionalProperties": true
           },
-          "(?i)^ErrorHandling$": {
+          "errorhandling": {
             "type": "object",
             "description": "Optional error handling configuration for the task.",
-            "patternProperties": {
-              "(?i)^Strategy$": {
+            "properties": {
+              "strategy": {
                 "type": "string",
-                "pattern": "(?i)^(Abort|Skip|Retry)$",
+                "enum": [ "abort", "skip", "retry" ],
                 "default": "Abort",
                 "description": "Defines how the task reacts when an error occurs."
               },
-              "(?i)^RetryPolicy$": {
+              "retrypolicy": {
                 "type": "object",
                 "description": "Retry policy configuration for the task.",
-                "patternProperties": {
-                  "(?i)^MaxRetries$": {
+                "properties": {
+                  "maxretries": {
                     "type": "integer",
                     "minimum": 0,
                     "default": 3,
                     "description": "Maximum number of retry attempts for failed tasks."
                   },
-                  "(?i)^BackoffStrategy$": {
+                  "backoffstrategy": {
                     "type": "string",
-                    "pattern": "(?i)^(Fixed|Linear|Exponential|Jitter)$",
+                    "enum": [ "fixed", "linear", "exponential", "jitter" ],
                     "default": "Fixed",
                     "description": "Strategy used to determine the delay between retries."
                   },
-                  "(?i)^InitialDelay$": {
+                  "initialdelay": {
                     "type": "integer",
                     "minimum": 0,
                     "default": 1000,
                     "description": "Initial delay (in milliseconds) before the first retry."
                   },
-                  "(?i)^MaxDelay$": {
+                  "maxdelay": {
                     "type": "integer",
                     "minimum": 0,
                     "default": 10000,
                     "description": "Maximum delay (in milliseconds) between retries."
                   },
-                  "(?i)^BackoffCoefficient$": {
+                  "backoffcoefficient": {
                     "type": "number",
                     "minimum": 0,
                     "default": 2.0,
@@ -185,20 +193,48 @@
             },
             "additionalProperties": false
           },
-          "(?i)^Output$": {
+          "manualapproval": {
+            "type": "object",
+            "description": "Manual approval configuration for the task.",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "description": "Indicates if manual approval is required for the task."
+              },
+              "approvers": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "List of approvers for the manual approval."
+              },
+              "instructions": {
+                "type": "string",
+                "default": "",
+                "description": "Instructions for the approvers."
+              },
+              "defaultaction": {
+                "type": "string",
+                "default": "abort",
+                "enum": ["abort", "approve"],
+                "description": "Default action if no approval is received."
+              }
+            },
+            "required": ["enabled"]
+          },
+          "output": {
             "type": "string",
             "default": "",
             "description": "Optional output of the task."
           },
-          "(?i)^Position$": {
+          "position": {
             "type": "object",
-            "required": [ "X", "Y" ],
-            "patternProperties": {
-              "(?i)^X$": {
+            "required": [ "x", "y" ],
+            "properties": {
+              "x": {
                 "type": "number",
                 "description": "Horizontal coordinate for visual placement."
               },
-              "(?i)^Y$": {
+              "y": {
                 "type": "number",
                 "description": "Vertical coordinate for visual placement."
               }

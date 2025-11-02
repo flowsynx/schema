@@ -93,9 +93,9 @@
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
-            <th scope="col" style="width: 20%">Version</th>
+            <th scope="col" style="width: 20%;">Version</th>
             <th scope="col">Generated Date</th>
-            <th scope="col" style="width: 15%;">Actions</th>
+            <th scope="col" style="width: 15%;">Schema Variants</th>
           </tr>
         </thead>
         <tbody>
@@ -103,8 +103,15 @@
             <td><strong>v1.1.0</strong></td>
             <td data-date="2025-10-30"></td>
             <td>
-              <a href="workflows/v1.1.0/schema.json" class="btn btn-outline-primary btn-sm">
-                View JSON
+              <a href="workflows/v1.1.0/schema.camel.json" 
+                 class="btn btn-outline-primary btn-sm" 
+                 title="Canonical schema (camelCase)">
+                Camel Case
+              </a>
+              <a href="workflows/v1.1.0/schema.flat.json" 
+                 class="btn btn-outline-primary btn-sm" 
+                 title="Lowercase flat schema (no internal capitalization)">
+                Flat
               </a>
             </td>
           </tr>
@@ -112,13 +119,20 @@
             <td><strong>v1.0.0</strong></td>
             <td data-date="2025-09-27"></td>
             <td>
-              <a href="workflows/v1.0.0/schema.json" class="btn btn-outline-primary btn-sm">
-                View JSON
+              <a href="workflows/v1.0.0/schema.camel.json" 
+                 class="btn btn-outline-primary btn-sm" 
+                 title="Canonical schema (camelCase)">
+                Camel Case
+              </a>
+              <a href="workflows/v1.0.0/schema.flat.json" 
+                 class="btn btn-outline-primary btn-sm" 
+                 title="Lowercase flat schema (no internal capitalization)">
+                Flat
               </a>
             </td>
           </tr>
         </tbody>
-      </table>
+      </table>      
     </div>
   </main>
 
