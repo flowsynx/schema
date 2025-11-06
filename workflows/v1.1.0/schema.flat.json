@@ -39,8 +39,19 @@
           "properties": {
             "strategy": {
               "type": "string",
-              "enum": [ "abort", "skip", "retry" ],
+              "enum": [ "abort", "skip", "retry", "triggertask" ],
               "description": "Defines how the workflow reacts when a task fails."
+            },
+            "triggerpolicy": {
+              "type": "object",
+              "required": [ "taskname" ],
+              "properties": {
+                "taskname": {
+                  "type": "string",
+                  "description": "Name of the task to trigger upon failure.",
+                  "minLength": 1
+                }
+              }
             },
             "retrypolicy": {
               "type": "object",
@@ -149,9 +160,20 @@
             "properties": {
               "strategy": {
                 "type": "string",
-                "enum": [ "abort", "skip", "retry" ],
+                "enum": [ "abort", "skip", "retry", "triggertask" ],
                 "default": "Abort",
                 "description": "Defines how the task reacts when an error occurs."
+              },
+              "triggerpolicy": {
+                "type": "object",
+                "required": [ "taskname" ],
+                "properties": {
+                  "taskname": {
+                    "type": "string",
+                    "description": "Name of the task to trigger upon failure.",
+                    "minLength": 1
+                  }
+                }
               },
               "retrypolicy": {
                 "type": "object",
