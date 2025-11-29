@@ -61,16 +61,80 @@
 	  transition: background-color 0.3s;
 	}
 
-	.btn-outline-primary {
-	  color: var(--bs-primary);
-	  border-color: var(--bs-primary);
-	  transition: all 0.2s ease;
-	}
 
-	.btn-outline-primary:hover {
-	  background-color: var(--bs-primary);
-	  color: #fff;
-	}
+	.btn-primary {
+    color: #fff !important;
+    background-color: #008b8b !important;
+    border-color: #007575 !important;
+    transition: color 0.3s, background-color 0.3s, border-color 0.3s;
+}
+
+    .btn-primary:hover {
+        color: #fff !important;
+        background-color: #007575 !important;
+        border-color: #006565 !important;
+    }
+
+    .btn-primary:focus,
+    .btn-primary.focus {
+        box-shadow: 0 0 0 0.25rem rgba(0, 139, 139, 0.25);
+    }
+
+    .btn-primary:active,
+    .btn-primary.active,
+    .show > .btn-primary.dropdown-toggle {
+        color: #fff !important;
+        background-color: #006565 !important;
+        border-color: #005555 !important;
+    }
+
+        .btn-primary:active:focus {
+            color: #fff !important;
+            background-color: #006565 !important;
+            border-color: #005555 !important;
+        }
+
+    .btn-primary:disabled,
+    .btn-primary.disabled {
+        color: #fff !important;
+        background-color: #008b8b !important;
+        border-color: #007575 !important;
+        opacity: 0.65;
+    }
+
+.btn-outline-primary {
+    color: #008b8b !important;
+    border-color: #008b8b !important;
+    transition: color 0.3s, background-color 0.3s, border-color 0.3s;
+}
+
+    .btn-outline-primary:hover {
+        color: #fff !important;
+        background-color: #008b8b !important;
+        border-color: #008b8b !important;
+    }
+
+    .btn-outline-primary:focus,
+    .btn-outline-primary.focus {
+        color: #fff !important;
+        background-color: #008b8b !important;
+        border-color: #008b8b !important;
+    }
+
+    .btn-outline-primary:active,
+    .btn-outline-primary.active,
+    .show > .btn-outline-primary.dropdown-toggle {
+        color: #fff !important;
+        background-color: #007575 !important;
+        border-color: #006565 !important;
+    }
+
+    .btn-outline-primary:disabled,
+    .btn-outline-primary.disabled {
+        color: #008b8b !important;
+        background-color: transparent !important;
+        opacity: 0.65 !important;
+    }
 
 	.footer {
 	  color: #6c757d;
