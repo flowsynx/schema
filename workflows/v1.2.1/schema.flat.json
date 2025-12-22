@@ -1,0 +1,380 @@
+{
+  "$schema": "https://schema.flowsynx.io/workflows/v1.2.1/schema.flat.json",
+  "version": "1.2.1",
+  "title": "FlowSynx Workflow Definition",
+  "type": "object",
+  "required": [ "name", "tasks" ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique name identifying the workflow."
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the workflow."
+    },
+    "variables": {
+      "type": ["object", "null"],
+      "description": "A dictionary of variables used in the workflow, accessible in tasks.",
+      "additionalProperties": {
+        "type": ["string", "number", "boolean", "object", "array", "null"],
+        "description": "Variable value, can be any JSON type."
+      }
+    },
+    "configuration": {
+      "type": "object",
+      "properties": {
+        "degreeofparallelism": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximum number of tasks to execute concurrently."
+        },
+        "timeoutmilliseconds": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Workflow-level timeout in milliseconds."
+        },
+        "errorhandling": {
+          "type": "object",
+          "properties": {
+            "strategy": {
+              "type": "string",
+              "enum": [ "abort", "skip", "retry", "triggertask" ],
+              "description": "Defines how the workflow reacts when a task fails."
+            },
+            "triggerpolicy": {
+              "type": "object",
+              "required": [ "taskname" ],
+              "properties": {
+                "taskname": {
+                  "type": "string",
+                  "description": "Name of the task to trigger upon failure.",
+                  "minLength": 1
+                }
+              }
+            },
+            "retrypolicy": {
+              "type": "object",
+              "properties": {
+                "maxretries": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "default": 3,
+                  "description": "Maximum number of retry attempts for failed tasks."
+                },
+                "backoffstrategy": {
+                  "type": "string",
+                  "enum": [ "fixed", "linear", "exponential", "jitter" ],
+                  "default": "Fixed",
+                  "description": "Strategy used to determine the delay between retries."
+                },
+                "initialdelaymilliseconds": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "default": 1000,
+                  "description": "Initial delay (in milliseconds) before the first retry."
+                },
+                "maxdelaymilliseconds": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "default": 10000,
+                  "description": "Maximum delay (in milliseconds) between retries."
+                },
+                "backoffcoefficient": {
+                  "type": "number",
+                  "minimum": 0,
+                  "default": 2.0,
+                  "description": "Multiplier applied to the delay for exponential backoff."
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "description": "List of tasks that make up the workflow.",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "execution"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique name identifying the task."
+          },
+          "description": {
+            "type": ["string", "null"],
+            "description": "Optional description of the task."
+          },
+          "type": {
+            "type": "string",
+            "description": "Built-in or custom task type identifier."
+          },
+          "execution": {
+            "type": "object",
+            "required": ["operation"],
+            "properties": {
+              "operation": {
+                "type": "string",
+                "description": "Operation or plugin action identifier."
+              },
+              "specification": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Plugin or operation specification."
+              },
+              "parameters": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Runtime parameters for execution."
+              },
+              "timeoutmilliseconds": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Optional timeout for the task in milliseconds."
+              },
+              "agent": {
+                "required": ["enabled"],
+                "type": ["object", "null"],
+                "properties": {
+                  "enabled": { "type": "boolean" },
+                  "mode": {
+                    "type": "string",
+                    "enum": ["execute", "plan", "validate", "assist"],
+                    "default": "execute",
+                    "description": "Agent operation mode."
+                  },
+                  "instructions": { 
+                    "type": ["string", "null"], 
+                    "description": "Custom instructions to guide the agent's behavior."
+                  },
+                  "maxiterations": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "default": 3,
+                    "description": "Max iterations for agent reasoning loops."
+                  },
+                  "temperature": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.2,
+                    "description": "Temperature setting for AI model responses (0.0-1.0)."
+                  },
+                  "context": {
+                    "type": ["object", "null"],
+                    "additionalProperties": true,
+                    "description": "Additional context or constraints for the agent."
+                  },
+                  "allowtools": {
+                    "type": ["array", "null"],
+                    "items": { "type": "string" },
+                    "description": "Allow-list of tool names the agent is permitted to call."
+                  },
+                  "denytools": {
+                    "type": ["array", "null"],
+                    "items": { "type": "string" },
+                    "description": "Deny-list of tool names the agent must not call."
+                  },
+                  "maxtoolcalls": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 6,
+                    "description": "Maximum tool calls per agent run (safety cap)."
+                  },
+                  "requiretoolapproval": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether tool calls require approval (integrates with manual approval patterns)."
+                  },
+                  "dryrun": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "If true, the agent simulates tool effects and returns a plan (no side effects)."
+                  },
+                  "toolselection": {
+                    "type": ["string", "null"],
+                    "enum": ["auto", "required", "none"],
+                    "default": "auto",
+                    "description": "Tool selection strategy hint for providers"
+                  }
+                }
+              }
+            },
+            "additionalProperties": false
+          },
+          "flowcontrol": {
+            "type": "object",
+            "properties": {
+              "dependencies": {
+                "type": "array",
+                "items": { "type": "string" },
+                "default": [],
+                "description": "Names of tasks that must complete before this task starts."
+              },
+              "runonfailureof": {
+                "type": "array",
+                "items": { "type": "string" },
+                "default": [],
+                "description": "Names of tasks that, if they fail, will trigger this task to run."
+              },
+              "executioncondition": {
+                "type": ["object", "null"],
+                "properties": {
+                  "expression": { 
+                    "type": "string", 
+                    "description": "Condition expression to evaluate before executing the task." 
+                  },
+                  "description": { 
+                    "type": ["string", "null"], 
+                    "description": "Optional description of the execution condition." 
+                  }
+                },
+                "required": ["expression"]
+              },
+              "conditionalbranches": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["expression", "targettaskname"],
+                  "properties": {
+                    "expression": { 
+                      "type": "string", 
+                      "description": "Condition expression to evaluate for branching." 
+                    },
+                    "description": { 
+                      "type": ["string", "null"], 
+                      "description": "Optional description of the conditional branch." 
+                    },
+                    "targetTaskName": { 
+                      "type": "string", 
+                      "description": "Name of the target task to branch to if the condition is met."
+                    }
+                  }
+                },
+                "default": []
+              }
+            },
+            "additionalProperties": false
+          },
+          "errorhandling": {
+            "type": "object",
+            "description": "Optional error handling configuration for the task.",
+            "properties": {
+              "strategy": {
+                "type": "string",
+                "enum": [ "abort", "skip", "retry", "triggertask" ],
+                "default": "abort",
+                "description": "Defines how the task reacts when an error occurs."
+              },
+              "triggerpolicy": {
+                "type": "object",
+                "required": [ "taskname" ],
+                "properties": {
+                  "taskname": {
+                    "type": "string",
+                    "description": "Name of the task to trigger upon failure.",
+                    "minLength": 1
+                  }
+                }
+              },
+              "retrypolicy": {
+                "type": "object",
+                "description": "Retry policy configuration for the task.",
+                "properties": {
+                  "maxretries": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 3,
+                    "description": "Maximum number of retry attempts for failed tasks."
+                  },
+                  "backoffstrategy": {
+                    "type": "string",
+                    "enum": [ "fixed", "linear", "exponential", "jitter" ],
+                    "default": "Fixed",
+                    "description": "Strategy used to determine the delay between retries."
+                  },
+                  "initialdelaymilliseconds": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 1000,
+                    "description": "Initial delay (in milliseconds) before the first retry."
+                  },
+                  "maxdelaymilliseconds": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 10000,
+                    "description": "Maximum delay (in milliseconds) between retries."
+                  },
+                  "backoffcoefficient": {
+                    "type": "number",
+                    "minimum": 0,
+                    "default": 2.0,
+                    "description": "Multiplier applied to the delay for exponential backoff."
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "manualapproval": {
+            "type": "object",
+            "description": "Manual approval configuration for the task.",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "default": false,
+                "description": "Indicates if manual approval is required for the task."
+              },
+              "approvers": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "List of approvers for the manual approval."
+              },
+              "instructions": {
+                "type": "string",
+                "default": "",
+                "description": "Instructions for the approvers."
+              },
+              "defaultaction": {
+                "type": "string",
+                "default": "abort",
+                "enum": ["abort", "approve"],
+                "description": "Default action if no approval is received."
+              }
+            },
+            "required": ["enabled"]
+          },
+          "output": {
+            "type": "string",
+            "default": "",
+            "description": "Optional output of the task."
+          },
+          "position": {
+            "type": "object",
+            "required": [ "x", "y" ],
+            "properties": {
+              "x": {
+                "type": "number",
+                "description": "Horizontal coordinate for visual placement."
+              },
+              "y": {
+                "type": "number",
+                "description": "Vertical coordinate for visual placement."
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+} 
